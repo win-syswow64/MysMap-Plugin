@@ -39,19 +39,19 @@ export class MysMap extends plugin {
         {
           /** 命令正则匹配 */
           reg: '^#*(安装地图资源|更新地图资源)$',
-            fnc: 'installOrUpdate',
-            permission: 'master'
+          fnc: 'installOrUpdate',
+          permission: 'master'
         },
       ],
     });
 
-    this.path = './plugins/mysMap';
+    this.path = './plugins/MysMap-Plugin';
   }
 
   /** 安装或更新地图资源 */
   async installOrUpdate() {
-    const command = fs.existsSync(this.path) ? 'git pull' : 'git clone https://gitcode.com/catboss/MysMap.git ./plugins/mysMap/images';
-    
+    const command = fs.existsSync(this.path) ? 'git pull' : 'git clone https://gitcode.com/catboss/MysMap.git ./plugins/MysMap-Plugin/images';
+
     try {
       await execPromise(command);
       await this.reply('地图资源已成功安装或更新。');
