@@ -38,7 +38,7 @@ export class MysMap extends plugin {
         },
         {
           /** 命令正则匹配 */
-          reg: '^#*(安装地图资源|更新地图资源)$',
+          reg: '^#*(安装|更新)(强制)?地图资源$',
           fnc: 'installOrUpdate',
           permission: 'master'
         },
@@ -50,13 +50,38 @@ export class MysMap extends plugin {
 
   /** 安装或更新地图资源 */
   async installOrUpdate() {
-    const command = fs.existsSync(this.path) ? 'git pull' : 'git clone https://gitcode.com/catboss/MysMap.git ./plugins/MysMap-Plugin/images';
+    let command = "";
 
-    try {
-      await execPromise(command);
-      await this.reply('地图资源已成功安装或更新。');
-    } catch (error) {
-      await this.reply(`安装或更新失败: ${error.message}`);
+    // 判断 images 文件夹是否存在
+    if (fs.existsSync(this.path + '/images')) {
+      await this.reply('正在更新地图资源。');
+
+      // 判断是否是强制更新
+      command = this.e.msg.includes("强制") ? "git fetch && git reset --hard" : "git pull";
+
+      try {
+        // 使用 promisified exec 执行命令
+        await execPromise(command, { cwd: this.path + '/images', stdio: 'inherit' });
+        await this.reply("地图资源更新完成。");
+      } catch (error) {
+        // 错误处理，判断是否是最新
+        if (error.message.includes("Already up to date.")) {
+          await this.reply("当前资源已是最新。");
+        } else {
+          await this.reply(`地图资源更新错误:\n${error.message}`);
+        }
+      }
+    } else {
+      // 下载地图资源
+      await this.reply('开始下载地图资源。');
+      command = "git clone https://gitcode.com/catboss/MysMap.git ./images";
+
+      try {
+        await execPromise(command, { cwd: this.path, stdio: 'inherit' });
+        await this.reply("地图资源下载完成。");
+      } catch (error) {
+        await this.reply(`地图资源下载错误:\n${error.message}`);
+      }
     }
   }
 
