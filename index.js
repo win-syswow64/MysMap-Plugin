@@ -74,7 +74,7 @@ export class MysMap extends plugin {
     }
     else {
       await this.reply('开始下载地图资源。');
-      command = "git clone https://gitcode.com/catboss/MysMap.git ./images";
+      command = "git clone https://ghproxy.ganyu.us.kg/https://github.com/win-syswow64/MysMap.git ./images";
       exec(command, { cwd: this.path, stdio: 'inherit' }, (error) => {
         if (error) {
           this.reply(`地图资源更新错误:\n${error.message}`);
